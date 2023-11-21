@@ -1,0 +1,22 @@
+<configuration>
+
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{35} - %msg %n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <!-- block jetty mess debug message-->
+    <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="org.eclipse.angus" level="DEBUG"/>
+    <logger name="jakarta.mail" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
