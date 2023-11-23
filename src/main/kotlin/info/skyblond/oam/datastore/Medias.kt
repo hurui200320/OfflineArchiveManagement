@@ -5,11 +5,13 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 
 object Medias : Table("t_media") {
     val id: Column<String> = varchar("id", 20)
-    private val mediaType = varchar("media_type", length = 50)
-    private val generation = varchar("generation", length = 50)
-    private val lastSeen = long("last_seen")
+    val mediaType = varchar("media_type", length = 50)
+    val generation = varchar("generation", length = 50)
+    val lastSeen = long("last_seen")
 
     override val primaryKey = PrimaryKey(id, name = "PK_Media_ID")
+
+    fun existById(id: String) = Medias.select { Medias.id like id }.any()
 
     /**
      * Create a new Media record.
@@ -25,7 +27,7 @@ object Medias : Table("t_media") {
         it[lastSeen] = System.currentTimeMillis() / 1000
     }
 
-    fun removeById(id: String) = Medias.deleteWhere { Medias.id like id }
+    fun deleteById(id: String) = Medias.deleteWhere { Medias.id like id }
 
     /**
      * Updated by id. Null parameter means no update on this field.
@@ -41,7 +43,7 @@ object Medias : Table("t_media") {
         lastSeen?.let { f -> it[Medias.lastSeen] = f }
     }
 
-    fun findById(id: String) = Medias.select { Medias.id like id }.firstOrNull()
+    fun selectById(id: String) = Medias.select { Medias.id like id }.firstOrNull()
 }
 
 

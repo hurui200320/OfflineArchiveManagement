@@ -1,6 +1,5 @@
 package info.skyblond.oam.datastore
 
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
@@ -48,8 +47,12 @@ object FilesOnMedia : Table("t_file_on_media") {
         it[lastSeen] = System.currentTimeMillis() / 1000
     }
 
-    fun removeByMediaIdAndPath(mediaId: String, path: String) =
+    fun deleteByMediaIdAndPath(mediaId: String, path: String) =
         FilesOnMedia.deleteWhere { (FilesOnMedia.mediaId eq mediaId) and (FilesOnMedia.path eq path) }
+
+    fun deleteByMediaId(mediaId: String) =
+        FilesOnMedia.deleteWhere { FilesOnMedia.mediaId eq mediaId }
+
 
     /**
      * Updated by id. Null parameter means no update on this field.
@@ -66,7 +69,15 @@ object FilesOnMedia : Table("t_file_on_media") {
         lastSeen?.let { f -> it[FilesOnMedia.lastSeen] = f }
     }
 
-    fun findByMediaIdAndPath(mediaId: String, path: String) =
+    fun selectByMediaIdAndPath(mediaId: String, path: String) =
         FilesOnMedia.select { (FilesOnMedia.mediaId eq mediaId) and (FilesOnMedia.path eq path) }.firstOrNull()
+
+    fun selectByMediaId(mediaId: String) =
+        FilesOnMedia.select { FilesOnMedia.mediaId eq mediaId }
+            .orderBy(path)
+
+    fun countByMediaId(mediaId: String) =
+        FilesOnMedia.select { FilesOnMedia.mediaId eq mediaId }
+            .count()
 
 }

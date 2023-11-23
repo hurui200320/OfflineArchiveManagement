@@ -2,11 +2,7 @@ package info.skyblond.oam
 
 import org.bouncycastle.crypto.digests.SHA3Digest
 import java.nio.ByteBuffer
-import java.nio.file.AccessDeniedException
-import java.nio.file.Files
-import java.nio.file.LinkOption
-import java.nio.file.Path
-import java.nio.file.StandardOpenOption
+import java.nio.file.*
 import java.nio.file.attribute.UserDefinedFileAttributeView
 import java.util.*
 import kotlin.io.path.*
@@ -37,19 +33,20 @@ fun Path.sha3(
     bufferSize: Int = 256 * MB
 ): ByteArray = calculateSha3(SHA3Digest(256), this, bufferSize)
 
+// TODO: File or UserDefined?
 fun Path.listAttr(prefixFilter: String? = null) =
     Files.getFileAttributeView(this, UserDefinedFileAttributeView::class.java)
         .list()
         .filter { prefixFilter == null || it.startsWith(prefixFilter) }
 
-fun Path.readAttr(name: String): ByteArray? {
+fun Path.readAttr(name: String): ByteArray? = runCatching {
     val attrs = Files.getFileAttributeView(this, UserDefinedFileAttributeView::class.java)
     val size = attrs.size(name)
     if (size < 0) return null
     val byte = ByteArray(size)
     attrs.read(name, ByteBuffer.wrap(byte))
     return byte
-}
+}.getOrNull()
 
 fun Path.writeAttr(name: String, value: ByteArray) {
     val attrs = Files.getFileAttributeView(this, UserDefinedFileAttributeView::class.java)
@@ -64,7 +61,8 @@ fun Path.walkFile(
     while (list.isNotEmpty()) {
         val p = list.poll()
         if (p.isDirectory(LinkOption.NOFOLLOW_LINKS)) {
-            try {
+            try { // put at the head, in case we're tape
+                // ltfs.startblock
                 list.addAll(p.listDirectoryEntries())
             } catch (_: AccessDeniedException) {
                 // ignore inaccessible folder
