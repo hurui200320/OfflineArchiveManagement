@@ -1,14 +1,15 @@
 package info.skyblond.oam
 
 import org.bouncycastle.crypto.digests.SHA3Digest
-import java.nio.ByteBuffer
-import java.nio.file.*
-import java.nio.file.attribute.UserDefinedFileAttributeView
+import java.nio.file.AccessDeniedException
+import java.nio.file.LinkOption
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import java.util.*
 import kotlin.io.path.*
 
-private const val KB = 1024
-private const val MB = 1024 * KB
+internal const val KB = 1024
+internal const val MB = 1024 * KB
 
 private fun calculateSha3(
     digest: SHA3Digest,

@@ -2,7 +2,13 @@ package info.skyblond.oam.command.media
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.check
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.help
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
+import info.skyblond.oam.MB
 import info.skyblond.oam.datastore.FilesOnMedia
 import info.skyblond.oam.datastore.Medias
 import info.skyblond.oam.sha3
@@ -18,6 +24,11 @@ import kotlin.io.path.relativeToOrNull
 object ScanCommand : CliktCommand(
     help = "Scan a given media to calculate hash and update the index"
 ) {
+    private val bufferSize by option("-b", "--buffer-size").int()
+        .default(128)
+        .help("buffer size (in MB) for hash calculation, by default is 128MB")
+        .check("buffer size must be positive") { it > 0 }
+
     private val path by argument("path").path(mustExist = true, canBeFile = false)
     override fun run() {
         val mediaId = MediaCommand.mediaId
@@ -38,7 +49,7 @@ object ScanCommand : CliktCommand(
             echo("[I]Scanning $relativePathString")
             val size = p.fileSize()
             val t = System.currentTimeMillis() / 1000
-            val hash = p.sha3() // TODO: option for buffer size?
+            val hash = p.sha3(bufferSize * MB)
             val t2 = System.currentTimeMillis() / 1000 - t
             echo("[I]Finished $relativePathString, (${size / 1024 / 1024 / t2})MB/s")
             transaction {
@@ -57,8 +68,6 @@ object ScanCommand : CliktCommand(
                 (FilesOnMedia.mediaId eq mediaId) and (lastSeen lessEq startTime)
             }
         }
-        echo(
-            "[I]Done"
-        )
+        echo("[I]Done")
     }
 }

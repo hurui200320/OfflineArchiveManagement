@@ -2,6 +2,11 @@ package info.skyblond.oam.command.media
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.check
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.help
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
 import info.skyblond.oam.datastore.FilesOnMedia
 import info.skyblond.oam.datastore.Medias
@@ -14,6 +19,11 @@ import kotlin.io.path.relativeToOrNull
 object VerifyCommand : CliktCommand(
     help = "Verify a given media to ensure the data is correct"
 ) {
+    private val bufferSize by option("-b", "--buffer-size").int()
+        .default(128)
+        .help("buffer size (in MB) for hash calculation, by default is 128MB")
+        .check("buffer size must be positive") { it > 0 }
+
     private val path by argument("path").path(mustExist = true, canBeFile = false)
     override fun run() {
         val mediaId = MediaCommand.mediaId
@@ -44,7 +54,7 @@ object VerifyCommand : CliktCommand(
                 return@forEach
             }
 
-            val actualHash = p.sha3() // TODO: option for buffer size?
+            val actualHash = p.sha3(bufferSize)
 
             // checking the hash
             if (!actualHash.contentEquals(dbHash)) {

@@ -3,10 +3,7 @@ package info.skyblond.oam.command
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.help
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import info.skyblond.oam.command.CheckCommand.Entry.Companion.parseEntry
 import info.skyblond.oam.datastore.FileOnMedia
@@ -16,6 +13,7 @@ import info.skyblond.oam.toHex
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.upperCase
 import java.util.*
 
 object FileCommand : CliktCommand(
@@ -39,7 +37,8 @@ private object FindCommand : CliktCommand(
     private val name: String by argument("name")
     override fun run() {
         transaction {
-            FilesOnMedia.select { FilesOnMedia.path like "%${name}%" }.map { it.parseFileOnMedia() }
+            // use uppercase for case-insensitive search
+            FilesOnMedia.select { FilesOnMedia.path.upperCase() like "%${name.uppercase()}%" }.map { it.parseFileOnMedia() }
         }.forEach {
             val size = it.getSizeString(sizeForHuman)
             val hash = it.sha3Hash256.toHex()
@@ -59,6 +58,8 @@ private object CheckCommand : CliktCommand(
     private val count by option("-n", "--count").int()
         .default(Int.MAX_VALUE)
         .help("showing files that has less than N replicates")
+        .check("count must be positive") { it > 0 }
+
 
     private data class Entry(
         val size: Long,
