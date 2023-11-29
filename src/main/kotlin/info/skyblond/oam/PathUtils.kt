@@ -30,28 +30,25 @@ private fun calculateSha3(
  * Calculate the SHA3-256 of a given. By default, use buffer size of 256MB.
  * */
 fun Path.sha3(
-    bufferSize: Int = 256 * MB
+    bufferSize: Int = 128 * MB
 ): ByteArray = calculateSha3(SHA3Digest(256), this, bufferSize)
 
-// TODO: File or UserDefined?
-fun Path.listAttr(prefixFilter: String? = null) =
-    Files.getFileAttributeView(this, UserDefinedFileAttributeView::class.java)
-        .list()
-        .filter { prefixFilter == null || it.startsWith(prefixFilter) }
-
-fun Path.readAttr(name: String): ByteArray? = runCatching {
-    val attrs = Files.getFileAttributeView(this, UserDefinedFileAttributeView::class.java)
-    val size = attrs.size(name)
-    if (size < 0) return null
-    val byte = ByteArray(size)
-    attrs.read(name, ByteBuffer.wrap(byte))
-    return byte
+private fun Path.readLTFSAttr(name: String): String? = runCatching {
+    val process = ProcessBuilder("ltfsattr", "-p", name, pathString)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+    val ret = process.waitFor()
+    if (ret != 0) return null
+    return process.inputReader(Charsets.UTF_8).use { it.readText() }
 }.getOrNull()
 
-fun Path.writeAttr(name: String, value: ByteArray) {
-    val attrs = Files.getFileAttributeView(this, UserDefinedFileAttributeView::class.java)
-    attrs.write(name, ByteBuffer.wrap(value))
-}
+/**
+ * Get file's starting block number from LTFS using attr `ltfs.startblock`.
+ * Return null if not found, which might be caused by ltfsattr not found,
+ * or filesystem is not LTFS.
+ * */
+fun Path.readLTFSStartBlock(): Long? = readLTFSAttr("ltfs.startblock")?.trim()?.toLongOrNull()
 
 fun Path.walkFile(
     block: (Path) -> Unit

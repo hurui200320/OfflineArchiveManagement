@@ -46,4 +46,20 @@ object Medias : Table("t_media") {
     fun selectById(id: String) = Medias.select { Medias.id like id }.firstOrNull()
 }
 
+data class Media(
+    val id: String,
+    val mediaType: String,
+    val generation: String,
+    val lastSeen: Long
+) {
+    companion object {
+        fun ResultRow.parseMedia(): Media = Media(
+            id = this[Medias.id],
+            mediaType = this[Medias.mediaType],
+            generation = this[Medias.generation],
+            lastSeen = this[Medias.lastSeen],
+        )
+    }
+}
+
 

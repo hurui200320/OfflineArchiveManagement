@@ -16,13 +16,14 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.11")
     // ktorm and sqlite
     implementation("org.jetbrains.exposed:exposed-core:0.44.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.44.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.1")
     implementation("org.xerial:sqlite-jdbc:3.44.0.0")
     // hash
     implementation("org.bouncycastle:bcprov-jdk18on:1.77")
     // cli things
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
+    // json
+     implementation("com.google.code.gson:gson:2.10.1")
 
 
     testImplementation(kotlin("test"))
@@ -33,9 +34,12 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(17)
 }
 
 application {
     mainClass.set("MainKt")
+//    executableDir = "usr/local/bin"
+    executableDir = ""
+    applicationName = "oam"
 }

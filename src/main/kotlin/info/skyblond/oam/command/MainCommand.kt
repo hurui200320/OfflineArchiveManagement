@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
+import info.skyblond.oam.command.media.MediaCommand
 import info.skyblond.oam.datastore.FilesOnMedia
 import info.skyblond.oam.datastore.Medias
 import org.jetbrains.exposed.sql.Database
@@ -18,10 +19,10 @@ object MainCommand : CliktCommand() {
     init {
         subcommands(
             MediaCommand,
-            // FileCommand,
-            // StatusCommand,
-            // ImportCommand,
-            // ExportCommand
+            FileCommand,
+            StatusCommand,
+            ExportCommand,
+            ImportCommand,
         )
     }
 

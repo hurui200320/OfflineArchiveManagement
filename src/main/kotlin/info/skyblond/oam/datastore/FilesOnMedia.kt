@@ -1,5 +1,6 @@
 package info.skyblond.oam.datastore
 
+import info.skyblond.oam.toHumanSize
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
@@ -47,6 +48,10 @@ object FilesOnMedia : Table("t_file_on_media") {
         it[lastSeen] = System.currentTimeMillis() / 1000
     }
 
+    fun existByMediaIdAndPath(mediaId: String, path: String) =
+        FilesOnMedia.select { (FilesOnMedia.mediaId eq mediaId) and (FilesOnMedia.path eq path) }.any()
+
+
     fun deleteByMediaIdAndPath(mediaId: String, path: String) =
         FilesOnMedia.deleteWhere { (FilesOnMedia.mediaId eq mediaId) and (FilesOnMedia.path eq path) }
 
@@ -69,6 +74,28 @@ object FilesOnMedia : Table("t_file_on_media") {
         lastSeen?.let { f -> it[FilesOnMedia.lastSeen] = f }
     }
 
+    fun insertOrUpdate(
+        mediaId: String,
+        path: String,
+        size: Long,
+        sha3Hash256: ByteArray
+    ) {
+        runCatching {
+            insert(
+                mediaId = mediaId,
+                path = path,
+                size = size,
+                sha3Hash256 = sha3Hash256
+            )
+        }.onFailure {
+            updateByMediaIdAndPath(
+                mediaId, path,
+                size = size, sha3Hash256 = sha3Hash256,
+                lastSeen = System.currentTimeMillis() / 1000
+            )
+        }
+    }
+
     fun selectByMediaIdAndPath(mediaId: String, path: String) =
         FilesOnMedia.select { (FilesOnMedia.mediaId eq mediaId) and (FilesOnMedia.path eq path) }.firstOrNull()
 
@@ -80,4 +107,48 @@ object FilesOnMedia : Table("t_file_on_media") {
         FilesOnMedia.select { FilesOnMedia.mediaId eq mediaId }
             .count()
 
+}
+
+data class FileOnMedia(
+    val mediaId: String,
+    val path: String,
+    val size: Long,
+    val sha3Hash256: ByteArray,
+    val lastSeen: Long
+) {
+    val humanSize: String = size.toHumanSize()
+
+    fun getSizeString(forHuman: Boolean): String = if (forHuman) humanSize else size.toString()
+
+    companion object {
+        fun ResultRow.parseFileOnMedia(): FileOnMedia = FileOnMedia(
+            mediaId = this[FilesOnMedia.mediaId],
+            path = this[FilesOnMedia.path],
+            size = this[FilesOnMedia.size],
+            sha3Hash256 = this[FilesOnMedia.sha3Hash256],
+            lastSeen = this[FilesOnMedia.lastSeen],
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is FileOnMedia) return false
+
+        if (mediaId != other.mediaId) return false
+        if (path != other.path) return false
+        if (size != other.size) return false
+        if (!sha3Hash256.contentEquals(other.sha3Hash256)) return false
+        if (lastSeen != other.lastSeen) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = mediaId.hashCode()
+        result = 31 * result + path.hashCode()
+        result = 31 * result + size.hashCode()
+        result = 31 * result + sha3Hash256.contentHashCode()
+        result = 31 * result + lastSeen.hashCode()
+        return result
+    }
 }
