@@ -8,13 +8,7 @@
 name: Java CI with Gradle
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   workflow_dispatch:
-  release:
-    types: [published]
 
 permissions:
   contents: read
@@ -37,8 +31,12 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: assembleDist
+    - name: Compute the release tag
+      run: |
+        echo "release_tag=v`date '+%Y-%m-%d'`" >> $GITHUB_ENV
     - name: Release
       uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
       with:
-          files: build/distributions/oam-*
+        tag_name: ${{ env.release_tag }}
+        target_commitish: master
+        files: build/distributions/oam-*
