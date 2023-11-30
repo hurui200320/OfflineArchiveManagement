@@ -28,10 +28,9 @@ object VerifyCommand : CliktCommand(
     override fun run() {
         val mediaId = MediaCommand.mediaId
         // create media if not exists
-        transaction {
-            if (!Medias.existById(MediaCommand.mediaId)) {
-                Medias.insert(MediaCommand.mediaId, "unknown", "unknown")
-            }
+        if (transaction { !Medias.existById(mediaId) }) {
+            echo("[E]Media id $mediaId not found", err = true)
+            return
         }
         // sorted by starting block, thus we only run the tape once
         echo("[I]Listing files to verify")

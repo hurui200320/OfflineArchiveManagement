@@ -3,7 +3,6 @@ package info.skyblond.oam.command.media
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.arguments.argument
-import info.skyblond.oam.command.*
 
 object MediaCommand : CliktCommand(
     help = "Operations related to a given media"
