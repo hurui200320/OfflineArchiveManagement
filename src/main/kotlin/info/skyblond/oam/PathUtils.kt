@@ -1,38 +1,37 @@
 package info.skyblond.oam
 
-import org.bouncycastle.crypto.digests.SHA3Digest
 import java.nio.file.AccessDeniedException
 import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.security.MessageDigest
 import java.util.*
 import kotlin.io.path.*
 
 internal const val KB = 1024
 internal const val MB = 1024 * KB
 
-private fun calculateSha3(
-    digest: SHA3Digest,
+private fun digest(
+    algorithm: String,
     file: Path,
     bufferSize: Int
 ): ByteArray = file.inputStream(StandardOpenOption.READ).use { fis ->
+    val messageDigest = MessageDigest.getInstance(algorithm)
     val buffer = ByteArray(bufferSize)
     while (true) {
         val read = fis.read(buffer)
         if (read == -1) break
-        digest.update(buffer, 0, read)
+        messageDigest.update(buffer, 0, read)
     }
-    val output = ByteArray(digest.digestSize)
-    digest.doFinal(output, 0)
-    output
+    messageDigest.digest()
 }
 
 /**
- * Calculate the SHA3-256 of a given. By default, use buffer size of 256MB.
+ * Calculate the SHA3-256 of a given.
  * */
 fun Path.sha3(
-    bufferSize: Int = 128 * MB
-): ByteArray = calculateSha3(SHA3Digest(256), this, bufferSize)
+    bufferSize: Int
+): ByteArray = digest("SHA3-256", this, bufferSize)
 
 private fun Path.readLTFSAttr(name: String): String? = runCatching {
     val process = ProcessBuilder("ltfsattr", "-p", name, pathString)

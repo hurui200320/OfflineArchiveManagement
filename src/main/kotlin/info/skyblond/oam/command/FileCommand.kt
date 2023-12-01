@@ -55,6 +55,10 @@ private object FindCommand : CliktCommand(
 private object CheckCommand : CliktCommand(
     help = "Check all files and show the replications info"
 ) {
+    private val mediaIdList by option("-m", "--media")
+        .multiple()
+        .help("showing files related to the given media ids")
+
     private val count by option("-n", "--count").int()
         .default(Int.MAX_VALUE)
         .help("showing files that has less than N replicates")
@@ -91,11 +95,14 @@ private object CheckCommand : CliktCommand(
 
     override fun run() {
         transaction {
-            FilesOnMedia.selectAll().map { it.parseFileOnMedia() }
+            FilesOnMedia.selectAll().asSequence()
+                .map { it.parseFileOnMedia() }
+                .filter { mediaIdList.isEmpty() || it.mediaId in mediaIdList }
+                .toList()
         }.groupBy { it.parseEntry() }
             .filter { it.value.size < count }
             .forEach { (entry, files) ->
-                echo("sha3-256: ${entry.hash.toHex()}, size: ${entry.size}:")
+                echo("sha3-256: ${entry.hash.toHex()}, size: ${entry.size}")
                 files.forEach {
                     echo(
                         "\t" + it.mediaId + ":" + it.path + ", last seen: ${Date(it.lastSeen * 1000)}"

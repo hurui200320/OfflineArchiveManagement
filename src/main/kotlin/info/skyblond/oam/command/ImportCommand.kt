@@ -20,7 +20,6 @@ object ImportCommand : CliktCommand(
     private val forceOverwrite by option("-f", "--force").flag()
         .help("Overwrite existing record")
 
-
     private val verbose by option("-v", "--verbose").flag()
         .help("Print what is skipped or overwrote")
 

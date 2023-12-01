@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "info.skyblond"
-version = "1.0-SNAPSHOT"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
@@ -18,13 +18,10 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:0.44.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.1")
     implementation("org.xerial:sqlite-jdbc:3.44.0.0")
-    // hash
-    implementation("org.bouncycastle:bcprov-jdk18on:1.77")
     // cli things
     implementation("com.github.ajalt.clikt:clikt:4.2.1")
     // json
-     implementation("com.google.code.gson:gson:2.10.1")
-
+    implementation("com.google.code.gson:gson:2.10.1")
 
     testImplementation(kotlin("test"))
 }

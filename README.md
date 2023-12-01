@@ -40,38 +40,36 @@ oam media <media_id> <operation>
 
 Available operations are:
 
-#### scan
+#### walk
 
 ```shell
-oam media <media_id> scan <path>
+oam media <media_id> walk <path>...
 ```
 
-Assuming tape is mounted at `path`, then this operation will scan all files under
-the `path`, calculating the SHA3-256 of them, and storing them into the database.
+This will walk the given path list and perform some actions.
+
+For option `-a`, it will only calculate the hash of new files and append them into the database.
+
+For option `-u`, it will only calculate the hash of existing files and update their hash.
+
+For option `-v`, it will only calculate the hash of existing files,
+and check if they match with the record in the database.
+If not match, the file index will be removed from the database.
+
+During the process, the software will calculate the SHA3-256 of them.
+You may use `-b` option to use different buffer size to fit your LTO tape drive's speed.
 
 Now you know what files are on this media.
 The software will also record the size, hash and scan time.
 
-You may use `-b` option to use different buffer size to fit your LTO tape drive's speed.
-Default is `-b 128`, aka 128MB.
-
-#### verify
+#### purge
 
 ```shell
-oam media <media_id> verify <path>
+oam media <media_id> purge
 ```
 
-Assuming tape is mounted at `path`, then this operation will calculate the hash of
-all files under `path`.
-Then it will compare the calculated hash with the database to see if anything is wrong.
-
-This will not update the database.
-If something is wrong, it will let you know.
-Once you fix the file or accept your fate that losing some files, you may run scan again
-to update the database with your operation (either remove the damaged file, or update the hash).
-
-You may use `-b` option to use different buffer size to fit your LTO tape drive's speed.
-Default is `-b 128`, aka 128MB.
+Purge the file indexes related to a given media ID.
+Like `remove`, but doesn't delete the media itself. 
 
 #### list
 
@@ -156,6 +154,8 @@ The software will match files with the same hash and size.
 Then it will count how many duplicates each file has.
 
 Using option `-n N` to show only the files with less than N duplicates.
+
+Using option `-m mediaId` to show only the files related to a given media ID.
 
 ### Misc
 

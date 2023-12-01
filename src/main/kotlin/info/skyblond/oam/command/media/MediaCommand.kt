@@ -14,8 +14,8 @@ object MediaCommand : CliktCommand(
 
     init {
         subcommands(
-            ScanCommand,
-            VerifyCommand,
+            WalkCommand,
+            PurgeCommand,
             ListCommand,
             RemoveCommand,
             InfoCommand
