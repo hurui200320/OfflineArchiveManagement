@@ -19,6 +19,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 import kotlin.io.path.fileSize
 import kotlin.io.path.relativeToOrNull
+import kotlin.math.max
 
 object WalkCommand : CliktCommand(
     help = "Walk a given media to append, update or verify files."
@@ -95,7 +96,7 @@ object WalkCommand : CliktCommand(
                 echo("[I]Calculating hash for $relativePathString")
                 val t = System.currentTimeMillis() / 1000
                 val hash = p.sha3(bufferSize * MB)
-                val dt = System.currentTimeMillis() / 1000 - t
+                val dt = max(1, System.currentTimeMillis() / 1000 - t)
                 echo(
                     "[I]Finished $relativePathString, " +
                             "$dt s, ${size / 1024 / 1024 / dt} MB/s"

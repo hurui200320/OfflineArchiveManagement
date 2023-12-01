@@ -203,7 +203,7 @@ Here is my workflow:
 3. Use `oam media local walk -au <path/to/local/data>` to generate a reference hash on the correct data (assuming data on your local drive is correct)
 4. Use `oam media <barcode> walk -au <path/to/ltfs>` to calculate the hash of files on tape, then store in the database.
 5. Use `oam file check -m local -m <barcode> -n 2` to exam if every file is matched. This command should have no output if everything is correct.
-6. Then copy the sample data to other two tapes. I keep 3 copies of the same data to ensure safety.
+6. Then copy the sample data to other two tapes and check. I keep 3 copies of the same data to ensure safety.
 
 Tips:
 + Using tools like TeraCopy, you can leave a checksum file on the tape. So I can check the file even I lost the database of this software.
