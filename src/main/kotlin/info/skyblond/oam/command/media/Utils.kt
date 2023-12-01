@@ -8,7 +8,7 @@ import java.nio.file.Path
 internal fun CliktCommand.listFiles(path: Path): List<Path> {
     val listOfPaths = buildList { path.walkFile { add(it) } }
     return if (listOfPaths.isNotEmpty() && listOfPaths[0].readLTFSStartBlock() != null) {
-        echo("[I]Found LTFS attr")
+        echo("[I]Reading LTFS attr...")
         listOfPaths.sortedBy { p ->
             p.readLTFSStartBlock() ?: error("Missing attr `list.startblock`: $p")
         }

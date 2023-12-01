@@ -15,16 +15,17 @@ private fun digest(
     algorithm: String,
     file: Path,
     bufferSize: Int
-): ByteArray = file.inputStream(StandardOpenOption.READ).use { fis ->
-    val messageDigest = MessageDigest.getInstance(algorithm)
-    val buffer = ByteArray(bufferSize)
-    while (true) {
-        val read = fis.read(buffer)
-        if (read == -1) break
-        messageDigest.update(buffer, 0, read)
+): ByteArray = file.inputStream(StandardOpenOption.READ)
+    .buffered(bufferSize).use { fis ->
+        val messageDigest = MessageDigest.getInstance(algorithm)
+        val buffer = ByteArray(4 * MB)
+        while (true) {
+            val read = fis.read(buffer)
+            if (read == -1) break
+            messageDigest.update(buffer, 0, read)
+        }
+        messageDigest.digest()
     }
-    messageDigest.digest()
-}
 
 /**
  * Calculate the SHA3-256 of a given.
