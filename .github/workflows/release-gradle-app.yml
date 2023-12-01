@@ -24,15 +24,15 @@ jobs:
       with:
         java-version: '17'
         distribution: 'zulu'
+    - name: Compute the release tag
+      run: |
+        echo "release_tag=v`date '+%Y-%m-%d'`" >> $GITHUB_ENV
     - name: Make gradlew executable
       run: chmod +x ./gradlew
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: assembleDist
-    - name: Compute the release tag
-      run: |
-        echo "release_tag=v`date '+%Y-%m-%d'`" >> $GITHUB_ENV
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
