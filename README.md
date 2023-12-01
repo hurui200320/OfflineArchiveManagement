@@ -194,6 +194,29 @@ You may use option `-f` to overwrite the existing one.
 
 Use option `-v` to print which records are skipped or overwrote.
 
+## Example
+
+Here is my workflow:
+
+1. Fill a second-hand cartridge with data to be archived, this will show how compression works out on the given dataset.
+2. Keep a local copy of those data on test cartridge.
+3. Use `oam media local walk -au <path/to/local/data>` to generate a reference hash on the correct data (assuming data on your local drive is correct)
+4. Use `oam media <barcode> walk -au <path/to/ltfs>` to calculate the hash of files on tape, then store in the database.
+5. Use `oam file check -m local -m <barcode> -n 2` to exam if every file is matched. This command should have no output if everything is correct.
+6. Then copy the sample data to other two tapes. I keep 3 copies of the same data to ensure safety.
+
+Tips:
++ Using tools like TeraCopy, you can leave a checksum file on the tape. So I can check the file even I lost the database of this software.
++ Using 1 second-hand HPE MP tape with 2 brand-new tapes, 1 for HPE MP, 1 for IBM BaFe. Mixing brands and techs should give my data more chance to survive.
++ Using `oam media <barcod> walk -v <path/to/ltfs>` to check files on tape every 3 or 6 months.
+  + This is important when I don't have ideal environment to store those tapes.
+
+Despite tapes are not set and forget, it's still worth working with it since:
+1. it doesn't run 7x24, so I don't have to invest a UPS
+2. I can check it every 3 or 6 months instead of every month when using UnRaid
+3. it doesn't occupy a lot of space
+4. tapes are so coooooool!
+
 ## Contribute
 
 I never have though someone will contribute to this project. But you're welcome.
