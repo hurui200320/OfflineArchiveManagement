@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "info.skyblond"
-version = "1.0.1"
+version = System.getenv("release_tag") ?: "dev"
 
 repositories {
     mavenCentral()
