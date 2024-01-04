@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
     application
 }
 
@@ -13,7 +13,7 @@ repositories {
 dependencies {
     // kotlin logging and logback
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
+    implementation("ch.qos.logback:logback-classic:1.4.12")
     // ktorm and sqlite
     implementation("org.jetbrains.exposed:exposed-core:0.44.1")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.1")
