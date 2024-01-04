@@ -35,7 +35,7 @@ object StatusCommand : CliktCommand(
         val currentTimestamp = System.currentTimeMillis() / 1000
         echo("\nMedias:")
         transaction {
-            Medias.selectAll().map { it.parseMedia() }
+            Medias.selectAll().orderBy(Medias.lastSeen).map { it.parseMedia() }
         }.filter {
             // warning if time not correct
             if (it.lastSeen > currentTimestamp)
