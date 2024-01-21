@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 
-object MainCommand : CliktCommand() {
+object MainCommand : CliktCommand(name = "oam") {
 
     init {
         subcommands(

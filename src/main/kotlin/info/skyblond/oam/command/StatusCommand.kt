@@ -15,7 +15,7 @@ object StatusCommand : CliktCommand(
 ) {
 
     private val listAll by option("-l", "--list").flag()
-        .help("List medias and files")
+        .help("List medias")
     private val olderThan by option("-o", "--older-than").int()
         .default(0)
         .help("showing medias that haven't been seen in N months (30 days/month)")

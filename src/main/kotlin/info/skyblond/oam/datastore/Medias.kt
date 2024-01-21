@@ -4,7 +4,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 
 object Medias : Table("t_media") {
-    val id: Column<String> = varchar("id", 20)
+    val id: Column<String> = varchar("id", length = 20)
     val mediaType = varchar("media_type", length = 50)
     val generation = varchar("generation", length = 50)
     val lastSeen = long("last_seen")
